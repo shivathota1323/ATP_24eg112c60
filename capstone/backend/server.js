@@ -1,63 +1,56 @@
-// Create express application
-import cors from 'cors';
-import exp from 'express'
-import {connect} from 'mongoose'
-import {config} from 'dotenv'
-import { userApp } from './APIs/UserAPI.js';
-import { authorApp } from './APIs/AuthorAPI.js';
-import { adminApp } from './APIs/AdminAPI.js';
-import { commonApp } from './APIs/CommonAPI.js';
-import cookieParser from 'cookie-parser';
-
-
+import exp from "express";
+import { config } from "dotenv";
+import { connect } from "mongoose";
+import { userApp } from "./APIs/UserAPI.js";
+import { authorApp } from "./APIs/AuthorAPI.js";
+import { adminApp } from "./APIs/AdminAPI.js";
+import { commonApp } from "./APIs/CommonAPI.js";
+import cookieParser from "cookie-parser";
+import cors from 'cors'
 config();
-const app = exp()
-// assign port
 
+//create express app
+const app = exp();
+//enable cors
+app.use(cors({
+  origin:['http://localhost:5173'],
+  credentials:true
+}))
+//add cookie parser middeleware
+app.use(cookieParser())
+//body parser middleware
+app.use(exp.json());
+//path level middlewares
+app.use("/user-api", userApp);
+app.use("/author-api", authorApp);
+app.use("/admin-api", adminApp);
+app.use("/auth", commonApp);
 
-// connect to db
- async function connectDB(){
-    try{
-        await connect(process.env.DB_URL);
-        console.log("connected to database");
-        
-        const port = process.env.PORT || 5000;
-        app.listen(port,()=>console.log(`server started on port ${port}`))
-    }
-    catch(err){
-        console.log("error in db connection");
-        
-    }
-}
+//connect to db
+const connectDB = async () => {
+  try {
+    await connect(process.env.DB_URL);
+    console.log("DB server connected");
+    //assign port
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => console.log(`server listening on ${port}..`));
+  } catch (err) {
+    console.log("err in db connect", err);
+  }
+};
 
 connectDB();
 
-
-
-// body parser middleware
-app.use(exp.json());
-app.use(cookieParser())
-//path level middleware
-app.use('/user-api',userApp);
-app.use('/author-api',authorApp);
-app.use('/admin-api',adminApp);
-app.use('/auth',commonApp);
-
-
-
 //to handle invalid path
-app.use((req,res,next)=>{
-    console.log(req.url)
-    res.status(404).json({message:`path ${req.url} is invalid`})
-})
-// error handling middleware[ALWAYS KEEP AT END OF THE FILE]
+app.use((req, res, next) => {
+  console.log(req.url);
+  res.status(404).json({ message: `path ${req.url} is invalid` });
+});
+
 //Error handling middleware
 app.use((err, req, res, next) => {
-  console.log("Error name:", err.name);
-  // console.log("Error code:", err.code);
-  // console.log("Error cause:", err.cause);
-  // console.log("Full error:", JSON.stringify(err, null, 2));
-  console.log(err.stack);
+  console.log("error is ",err)
+  console.log("Full error:", JSON.stringify(err, null, 2));
   //ValidationError
   if (err.name === "ValidationError") {
     return res.status(400).json({ message: "error occurred", error: err.message });

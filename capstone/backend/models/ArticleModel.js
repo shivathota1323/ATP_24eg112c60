@@ -1,23 +1,23 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 
-//Create user comment schema
-const userCommentSchema = new Schema({
+const commentSchema = new Schema({
   user: {
-    type: Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: "user",
+    required: [true, "User ID required"],
   },
   comment: {
     type: String,
+    required:[true,"Enter a comment"],
   },
 });
 
-//create article schema
 const articleSchema = new Schema(
   {
     author: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "user",
-      required: [true, "Author ID required"],
+      required: [true, "Author ID is required"],
     },
     title: {
       type: String,
@@ -31,18 +31,24 @@ const articleSchema = new Schema(
       type: String,
       required: [true, "Content is required"],
     },
-    comments: [userCommentSchema],
+    comments: [{ type: commentSchema, default: [] }],
     isArticleActive: {
       type: Boolean,
       default: true,
     },
   },
   {
+    versionKey: false,
     timestamps: true,
     strict: "throw",
-    versionKey: false,
   },
 );
 
-//Create article model
+//create article model
 export const ArticleModel = model("article", articleSchema);
+
+// "mbsdf6sdf6df6sd6fs6dfs6df6sd"
+//ObjectId("bf7f7f7f7f7f7f77f7f")
+
+//{ comment:"",user:""}
+//find().populate("cart.product","pid productName brand")

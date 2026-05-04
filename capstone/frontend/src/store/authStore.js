@@ -1,5 +1,5 @@
-import axios from "axios";
 import { create } from "zustand";
+import axios from "axios";
 
 export const useAuth = create((set) => ({
   currentUser: null,
@@ -7,20 +7,21 @@ export const useAuth = create((set) => ({
   isAuthenticated: false,
   error: null,
   login: async (userCred) => {
-   // const { role, ...userCredObj } = userCredWithRole;
+    // const { role, ...userCredObj } = userCredWithRole;
     try {
       //set loading true
-      set(state=>({...state,setLoading:true}))
+      set({ loading: true, currentUser: null, isAuthenticated: false, error: null });
       //make api call
-      let res=await axios.post("http://localhost/auth/login",userCred,{withCredentials:true})
+      let res = await axios.post("http://localhost:4000/auth/login", userCred, { withCredentials: true });
       //update state
-      if(res.status===200)
+      if (res.status === 200) {
         set({
-    currentUser:res.data?.payload,
-    loading:false,
-    isAuthenticated:true,
-    error:null
-})
+          currentUser: res.data?.payload,
+          loading: false,
+          isAuthenticated: true,
+          error: null,
+        });
+      }
     } catch (err) {
       console.log("err is ", err);
       set({
@@ -35,16 +36,16 @@ export const useAuth = create((set) => ({
   logout: async () => {
     try {
       //set loading state
-      setLoading(true)
       //make logout api req
-      let res=await axios.get("http://localhost/auth/logout",{withCredentials:true})
+      let res = await axios.get("http://localhost:4000/auth/logout", { withCredentials: true });
       //update state
-      if(res.status===200){
+      if (res.status === 200) {
         set({
-            currentUser:null,
-            isAuthenticated:false,
-            
-        })
+          currentUser: null,
+          isAuthenticated: false,
+          error: null,
+          loading: false,
+        });
       }
     } catch (err) {
       set({
@@ -53,6 +54,33 @@ export const useAuth = create((set) => ({
         currentUser: null,
         error: err.response?.data?.error || "Logout failed",
       });
+    }
+  },
+  // restore login
+  checkAuth: async () => {
+    try {
+      set({ loading: true });
+      const res = await axios.get("http://localhost:4000/auth/check-auth", { withCredentials: true });
+
+      set({
+        currentUser: res.data.payload,
+        isAuthenticated: true,
+        loading: false,
+      });
+    } catch (err) {
+      // If user is not logged in → do nothing
+      if (err.response?.status === 401) {
+        set({
+          currentUser: null,
+          isAuthenticated: false,
+          loading: false,
+        });
+        return;
+      }
+
+      // other errors
+      console.error("Auth check failed:", err);
+      set({ loading: false });
     }
   },
 }));

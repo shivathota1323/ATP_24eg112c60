@@ -10,10 +10,12 @@ import {
   errorClass,
   mutedText,
   linkClass,
+  loadingClass,
 } from "../styles/common";
-import { useAuth } from "../store/authStore";
 import { NavLink, useNavigate, useLocation } from "react-router";
+import { useAuth } from "../store/authStore";
 import { useEffect } from "react";
+import {toast} from 'react-hot-toast'
 
 function Login() {
   const {
@@ -22,31 +24,38 @@ function Login() {
     formState: { errors },
   } = useForm();
 
+  const navigate = useNavigate();
+  //get state from auth store
+  const { login, currentUser, loading, error, isAuthenticated } = useAuth((state) => state);
+  //on user login
   const onUserLogin = (userCredObj) => {
-    console.log(userCredObj);
+    //call login() of auth store
+    login(userCredObj);
   };
 
-  const {isAuthenticated,currentUser}=
-  // const =useAuth(state=>login)
-
-  useEffect(()=>{
+  useEffect(() => {
     //navigation logic
-    if(isAuthenticated===true)
-    {
-      if(currentUser.role=="USER")
-      {
-        navigate("/user-profile")
+    if (isAuthenticated === true) {
+      if (currentUser.role === "USER") {
+        //show cuccess toast
+        toast.success("Login success and redirecting to User Profile",{duration:2000})
+        navigate("/user-profile");
       }
-      if(currentUser.role=="AUTHOR")
-      {
-        navigate("/author-profile")
+      if (currentUser.role === "AUTHOR") {
+         toast.success("Login success and redirecting to Author Profile",{duration:2000})
+        navigate("/author-profile");
       }
-      if(currentUser.role=="ADMIN")
-      {
-        navigate("/admin-profile")
+      if (currentUser.role === "ADMIN") {
+         toast.success("Login success and redirecting to Admin Profile",{duration:2000})
+        navigate("/admin-profile");
       }
     }
-  },[isAuthenticated])
+  }, [isAuthenticated]);
+
+  //deal with loading
+  if (loading) {
+    return <p className={loadingClass}>Loading....</p>;
+  }
 
   return (
     <div className={`${pageBackground} flex items-center justify-center py-16 px-4`}>
@@ -55,7 +64,7 @@ function Login() {
         <h2 className={formTitle}>Sign In</h2>
 
         {/* API error */}
-        {/* {error && <p className={errorClass}>{error}</p>} */}
+        {error && <p className={errorClass}>{error}</p>}
 
         <form onSubmit={handleSubmit(onUserLogin)}>
           {/* Email */}

@@ -11,30 +11,30 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: [true, "Email required"],
       unique: [true, "Email already existed"],
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [true, "Password required"],
+    },
+    role: {
+      type: String,
+      enum: ["USER", "AUTHOR", "ADMIN"],
+      required: [true, "Invalid role"],
     },
     profileImageUrl: {
       type: String,
     },
-    role: {
-      type: String,
-      enum: ["AUTHOR", "USER", "ADMIN"],
-      required: [true, "{Value} is an invalid role"],
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
+    isUserActive:{
+        type:Boolean,
+        default:true
+    }
   },
   {
     timestamps: true,
-    strict: "throw",
     versionKey: false,
+    strict: "throw",
   },
 );
 
