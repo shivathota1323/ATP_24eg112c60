@@ -1,0 +1,39 @@
+*{
+    margin: 0;
+    border: 0;
+    box-sizing: border-box;
+
+
+}
+
+table{
+    margin: 50px;
+    width: 100%;
+    height:auto;
+    border-collapse: collapse;
+    
+}
+.row1{
+    color: rgb(209, 216, 222);
+    background-color: rgb(106, 201, 201);
+    padding: 8px;
+    border-radius: 6%;
+
+}
+.row2{
+    background-color: rgb(198, 231, 230);
+    color: rgb(48, 218, 210);
+    padding: 5px;
+    border-radius: 6%;
+    
+}
+.row3{
+    background-color: aquamarine;
+}
+img{
+    width: 50px;
+    border-radius: 50%;
+}
+.body{
+    background-color: rgb(240, 247, 245);
+}
